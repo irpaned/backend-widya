@@ -4,7 +4,23 @@ import UserService from "../services/User";
 async function FindProfile(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const user = await UserService.FindProfile(Number(id));
+    const user = await UserService.FindAllDataProfile(Number(id));
+    if (!user)
+      res.status(404).json({
+        message: "User not found!",
+      });
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({
+      message: error,
+    });
+  }
+}
+
+async function FindAllProfile(req: Request, res: Response) {
+  try {
+    const user = await UserService.FindAllUsersService();
     if (!user)
       res.status(404).json({
         message: "User not found!",
@@ -47,4 +63,4 @@ async function UpdateProfile(req: Request, res: Response) {
   }
 }
 
-export default { UpdateProfile, FindProfile };
+export default { UpdateProfile, FindProfile, FindAllProfile };

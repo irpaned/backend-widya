@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import ProductService from "../services/Product";
 
-async function findMany(req: Request, res: Response) {
+async function FindMany(req: Request, res: Response) {
   try {
     const data = await ProductService.findMany();
     res.status(200).json(data);
   } catch (error) {}
 }
 
-async function create(req: Request, res: Response) {
+async function Create(req: Request, res: Response) {
   try {
     const user = res.locals.user;
     const body = {
@@ -25,7 +25,7 @@ async function create(req: Request, res: Response) {
   }
 }
 
-async function remove(req: Request, res: Response) {
+async function Remove(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const data = await ProductService.remove(Number(id));
@@ -33,7 +33,7 @@ async function remove(req: Request, res: Response) {
   } catch (error) {}
 }
 
-async function update(req: Request, res: Response) {
+async function Update(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const user = res.locals.user;
@@ -51,9 +51,21 @@ async function update(req: Request, res: Response) {
   } catch (error) {}
 }
 
+async function RemoveAll(req: Request, res: Response) {
+  try {
+    const data = await ProductService.RemoveAll();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: "An unknown error occurred",
+    });
+  }
+}
+
 export default {
-  create,
-  findMany,
-  remove,
-  update,
+  FindMany,
+  Create,
+  Remove,
+  Update,
+  RemoveAll,
 };

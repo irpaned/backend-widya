@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ProductDTO } from "../dto/product-dto";
+import { ProductDTO } from "../dto/ProductDTO";
 import { cloudinaryDelete, cloudinaryUpload } from "../utils/cloudinaryHandler";
 import { productSchema } from "../validators/product";
 
@@ -96,4 +96,12 @@ async function edit(id: number, dto: ProductDTO, userId: number) {
   }
 }
 
-export default { findMany, create, remove, edit };
+async function RemoveAll() {
+  try {
+    return await prisma.productPackage.deleteMany();
+  } catch (error) {
+    throw new String(error);
+  }
+}
+
+export default { findMany, create, remove, edit, RemoveAll };

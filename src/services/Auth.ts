@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
-async function register(dto: registerDTO) {
+async function RegisterService(dto: registerDTO) {
   try {
     const validate = registerSchema.validate(dto);
 
@@ -43,7 +43,7 @@ async function createVerification(token: string, type: VerificationType) {
   }
 }
 
-async function login(dto: LoginDTO) {
+async function LoginService(dto: LoginDTO) {
   try {
     const validate = loginSchema.validate(dto);
 
@@ -75,7 +75,7 @@ async function login(dto: LoginDTO) {
   }
 }
 
-async function reset(dto: ResetDTO) {
+async function ResetPasswordService(dto: ResetDTO) {
   try {
     const user = await prisma.user.findFirst({
       where: {
@@ -106,7 +106,7 @@ async function reset(dto: ResetDTO) {
   }
 }
 
-async function remove(email: string) {
+async function RemoveService(email: string) {
   try {
     const user = await prisma.user.findFirst({
       where: {
@@ -115,13 +115,26 @@ async function remove(email: string) {
     });
 
     if (user) {
-      return await prisma.user.delete({
+      const DeleteProducts = await prisma.productPackage.deleteMany({
+        where: {
+          userId: user.id,
+        },
+      });
+      const DeleteUser = await prisma.user.delete({
         where: {
           email: String(email),
         },
       });
+
+      return { DeleteUser, DeleteProducts };
     }
   } catch (error) {}
 }
 
-export default { register, createVerification, login, reset, remove };
+export default {
+  RegisterService,
+  LoginService,
+  createVerification,
+  ResetPasswordService,
+  RemoveService,
+};

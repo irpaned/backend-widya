@@ -12,12 +12,41 @@ async function FindProfile(id: number) {
     });
 
     if (!profile) {
-      throw new Error("Profile not found!");
+      throw new Error("User not found!");
     }
 
     return {
       ...profile,
     };
+  } catch (error) {
+    throw new String(error);
+  }
+}
+
+async function FindAllDataProfile(id: number) {
+  try {
+    const profile = await prisma.user.findFirst({
+      where: { id },
+      include: {
+        product: true,
+      },
+    });
+
+    if (!profile) {
+      throw new Error("User not found!");
+    }
+
+    return {
+      ...profile,
+    };
+  } catch (error) {
+    throw new String(error);
+  }
+}
+
+async function FindAllUsersService() {
+  try {
+    return await prisma.user.findMany({});
   } catch (error) {
     throw new String(error);
   }
@@ -71,4 +100,9 @@ async function UpdateProfile(userId: number, dto: UserProfileDto) {
   }
 }
 
-export default { UpdateProfile, FindProfile };
+export default {
+  UpdateProfile,
+  FindProfile,
+  FindAllDataProfile,
+  FindAllUsersService,
+};

@@ -28,6 +28,7 @@ routerv1.get("/", async (req: Request, res: Response) => {
 routerv1.post("/auth/login", AuthController.Login);
 routerv1.post("/auth/register", AuthController.Register);
 routerv1.patch("/auth/resetpassword", AuthController.ResetPassword);
+routerv1.delete("/auth/delete", authenticate, AuthController.RemoveAccount);
 
 //USER
 routerv1.patch(
@@ -40,21 +41,23 @@ routerv1.patch(
   UserController.UpdateProfile
 );
 routerv1.get("/user/:id", authenticate, UserController.FindProfile);
+routerv1.get("/user", authenticate, UserController.FindAllProfile);
 
 //PRODUCT
 routerv1.post(
   "/product",
   authenticate,
   upload.single("photoProduct"),
-  ProductController.create
+  ProductController.Create
 );
-routerv1.get("/product", authenticate, ProductController.findMany);
-routerv1.delete("/product/:id", authenticate, ProductController.remove);
+routerv1.get("/product", authenticate, ProductController.FindMany);
+routerv1.delete("/product/:id", authenticate, ProductController.Remove);
+routerv1.delete("/product", ProductController.RemoveAll);
 routerv1.patch(
   "/product/:id",
   authenticate,
   upload.fields([{ name: "photoProduct", maxCount: 1 }]),
-  ProductController.update
+  ProductController.Update
 );
 
 app.listen(port, () => {
