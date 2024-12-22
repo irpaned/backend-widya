@@ -62,4 +62,22 @@ async function verifyEmail(req: Request, res: Response) {
   }
 }
 
-export default { register, verifyEmail };
+async function login(req: Request, res: Response) {
+  try {
+    const user = await AuthService.login(req.body);
+
+    res.json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "An unknown error occurred",
+      });
+    }
+  }
+}
+
+export default { register, verifyEmail, login };

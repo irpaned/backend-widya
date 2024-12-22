@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { registerDTO } from "../dto/AuthDTO";
+import { LoginDTO, registerDTO } from "../dto/AuthDTO";
 import { PrismaClient, VerificationType } from "@prisma/client";
-import { registerSchema } from "../validators/auth";
+import { loginSchema, registerSchema } from "../validators/auth";
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
@@ -80,4 +80,38 @@ async function verify(token: string) {
     }
   }
 }
-export default { register, createVerification, verify };
+
+async function login(dto: LoginDTO) {
+  try {
+    const validate = loginSchema.validate(dto);
+
+    if (validate.error) {
+      throw new String(validate.error.message);
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!user?.isVerified) throw new Error("User is not verified");
+    if (!user) throw new String("User not found!");
+
+    const isValidPassword = await bcrypt.compare(dto.password, user.password!);
+
+    if (!isValidPassword) throw new Error("User not found!");
+
+    const { password, ...restUser } = user;
+
+    const jwtSecret = process.env.JWT_SECRET as string;
+
+    const token = jwt.sign(restUser, jwtSecret);
+
+    return { token, restUser };
+  } catch (error) {
+    throw new String(error);
+  }
+}
+
+export default { register, createVerification, verify, login };

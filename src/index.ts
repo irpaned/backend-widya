@@ -21,7 +21,7 @@ routerv1.get("/", async (req: Request, res: Response) => {
 });
 
 //AUTH
-// routerv1.post("/auth/login", AuthController.login);
+routerv1.post("/auth/login", AuthController.login);
 routerv1.post("/auth/register", AuthController.register);
 // routerv1.get("/auth/check", authenticate, AuthController.check);
 // routerv1.post("/auth/reset-password", AuthController.resetPassword);
