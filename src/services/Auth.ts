@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { LoginDTO, registerDTO } from "../dto/AuthDTO";
+import { LoginDTO, registerDTO, ResetDTO } from "../dto/AuthDTO";
 import { PrismaClient, VerificationType } from "@prisma/client";
 import { loginSchema, registerSchema } from "../validators/auth";
 import jwt from "jsonwebtoken";
@@ -43,44 +43,6 @@ async function createVerification(token: string, type: VerificationType) {
   }
 }
 
-async function verify(token: string) {
-  try {
-    const verification = await prisma.verification.findUnique({
-      where: { token },
-    });
-    const userId = jwt.verify(
-      verification!.token,
-      process.env.JWT_SECRET as string
-    );
-
-    if (verification!.type === "FORGOT_PASSWORD") {
-      return await prisma.user.update({
-        data: {
-          isVerifiedEmail: true,
-        },
-        where: {
-          id: Number(userId),
-        },
-      });
-    } else {
-      return await prisma.user.update({
-        data: {
-          isVerified: true,
-        },
-        where: {
-          id: Number(userId),
-        },
-      });
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message || "Failed to verify email");
-    } else {
-      throw new Error("An unknown error occurred");
-    }
-  }
-}
-
 async function login(dto: LoginDTO) {
   try {
     const validate = loginSchema.validate(dto);
@@ -95,7 +57,6 @@ async function login(dto: LoginDTO) {
       },
     });
 
-    if (!user?.isVerified) throw new Error("User is not verified");
     if (!user) throw new String("User not found!");
 
     const isValidPassword = await bcrypt.compare(dto.password, user.password!);
@@ -114,4 +75,35 @@ async function login(dto: LoginDTO) {
   }
 }
 
-export default { register, createVerification, verify, login };
+async function reset(dto: ResetDTO) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: String(dto.email),
+      },
+    });
+
+    if (dto.password) {
+      const salt = 10;
+      const hashedPassword = await bcrypt.hash(dto.password, salt);
+      user!.password = hashedPassword;
+    }
+
+    if (user?.email == String(dto.email)) {
+      return await prisma.user.update({
+        where: { email: String(dto.email) },
+        data: {
+          password: user!.password,
+        },
+      });
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message || "Failed to reset password");
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export default { register, createVerification, login, reset };

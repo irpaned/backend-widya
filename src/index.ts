@@ -21,16 +21,11 @@ routerv1.get("/", async (req: Request, res: Response) => {
 });
 
 //AUTH
-routerv1.post("/auth/login", AuthController.login);
-routerv1.post("/auth/register", AuthController.register);
-// routerv1.get("/auth/check", authenticate, AuthController.check);
-// routerv1.post("/auth/reset-password", AuthController.resetPassword);
-// routerv1.patch("/auth/resetpassword", AuthController.ResetPassword);
-routerv1.get("/auth/verify-email", AuthController.verifyEmail);
-// routerv1.get(
-//   "/auth/verify-email-reset-password",
-//   AuthController.verifyEmailForForgotPassword
-// );
+routerv1.post("/auth/login", AuthController.Login);
+routerv1.post("/auth/register", AuthController.Register);
+routerv1.patch("/auth/resetpassword", AuthController.ResetPassword);
+
+//PRODUCT
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
