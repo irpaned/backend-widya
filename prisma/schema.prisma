@@ -35,7 +35,7 @@ model User {
 
 model ProductPackage {
   id           Int      @id @default(autoincrement())
-  photoProduct String
+  photoProduct String   @default("https://via.placeholder.com/150")
   productName  String
   price        Int?     @default(0)
   createdAt    DateTime @default(now())

@@ -3,7 +3,10 @@ import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import AuthController from "./controllers/Auth";
+import ProductController from "./controllers/Product";
+
 import { authenticate } from "./middleware/authenticate";
+import { upload } from "./libs/upload-file";
 
 dotenv.config();
 
@@ -26,6 +29,20 @@ routerv1.post("/auth/register", AuthController.Register);
 routerv1.patch("/auth/resetpassword", AuthController.ResetPassword);
 
 //PRODUCT
+routerv1.post(
+  "/product",
+  authenticate,
+  upload.single("photoProduct"),
+  ProductController.create
+);
+routerv1.get("/product", authenticate, ProductController.findMany);
+routerv1.delete("/product/:id", authenticate, ProductController.remove);
+routerv1.patch(
+  "/product/:id",
+  authenticate,
+  upload.fields([{ name: "photoProduct", maxCount: 1 }]),
+  ProductController.update
+);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

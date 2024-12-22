@@ -106,4 +106,22 @@ async function reset(dto: ResetDTO) {
   }
 }
 
-export default { register, createVerification, login, reset };
+async function remove(email: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: String(email),
+      },
+    });
+
+    if (user) {
+      return await prisma.user.delete({
+        where: {
+          email: String(email),
+        },
+      });
+    }
+  } catch (error) {}
+}
+
+export default { register, createVerification, login, reset, remove };
