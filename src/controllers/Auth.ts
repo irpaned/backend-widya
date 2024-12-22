@@ -43,4 +43,23 @@ async function register(req: Request, res: Response) {
   }
 }
 
-export default { register };
+async function verifyEmail(req: Request, res: Response) {
+  try {
+    const token = req.query.token as string;
+    await AuthService.verify(token);
+    // const frontendUrl = process.env.FRONTEND_URL;
+    // res.redirect(`${frontendUrl}/auth/login`);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "An unknown error occurred",
+      });
+    }
+  }
+}
+
+export default { register, verifyEmail };

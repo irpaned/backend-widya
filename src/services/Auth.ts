@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { registerDTO } from "../dto/AuthDTO";
 import { PrismaClient, VerificationType } from "@prisma/client";
 import { registerSchema } from "../validators/auth";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -41,4 +42,42 @@ async function createVerification(token: string, type: VerificationType) {
     }
   }
 }
-export default { register, createVerification };
+
+async function verify(token: string) {
+  try {
+    const verification = await prisma.verification.findUnique({
+      where: { token },
+    });
+    const userId = jwt.verify(
+      verification!.token,
+      process.env.JWT_SECRET as string
+    );
+
+    if (verification!.type === "FORGOT_PASSWORD") {
+      return await prisma.user.update({
+        data: {
+          isVerifiedEmail: true,
+        },
+        where: {
+          id: Number(userId),
+        },
+      });
+    } else {
+      return await prisma.user.update({
+        data: {
+          isVerified: true,
+        },
+        where: {
+          id: Number(userId),
+        },
+      });
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message || "Failed to verify email");
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+export default { register, createVerification, verify };
