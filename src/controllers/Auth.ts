@@ -13,12 +13,12 @@ async function register(req: Request, res: Response) {
     const fullUrl = req.protocol + "://" + req.get("host");
 
     await transporter.sendMail({
-      from: '"PT Widya Matador Inovasi" <muhammadirfan2823@gmail.com>',
+      from: '"PT WIDYA INFORMASI NUSANTARA" <muhammadirfan2823@gmail.com>',
       to: user.email,
       subject: "Verification Link",
       html: `
         <div style="background-color: #FFF; margin: auto; width: 50%; text-align: center; padding: 1rem; border-radius: 12px; font-family: Arial, Helvetica, sans-serif; color: black;">
-            <H1 style="color: #1B5184; font-weight: bold;">PT Widya Matador Inovasi</H1>
+            <H1 style="color: #1B5184; font-weight: bold;">PT WIDYA INFORMASI NUSANTARA</H1>
             <p style="font-size: 0.8rem;">Welcome!<br> Click the button below to verify your account</p>
             <Button style="background-color: #1B5184; border: none; border-radius: 12px; height: 40px; margin: 1rem;"><a style="text-decoration: none; color: white; margin: 0.5rem; font-size: 1rem;" href="${fullUrl}/api/v1/auth/verify-email?token=${token}">Verify</a></Button>
             <p style="font-size: 0.8rem;">Please ignore this message if you feel that you are not registering to our services.</p>
