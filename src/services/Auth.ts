@@ -69,7 +69,7 @@ async function LoginService(dto: LoginDTO) {
 
     const token = jwt.sign(restUser, jwtSecret);
 
-    return { token, restUser };
+    return { token, restUser, isLogin: true };
   } catch (error) {
     throw new String(error);
   }

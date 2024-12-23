@@ -26,6 +26,7 @@ routerv1.get("/", async (req: Request, res: Response) => {
 
 //AUTH
 routerv1.post("/auth/login", AuthController.Login);
+routerv1.get("/auth/check", authenticate, AuthController.Check);
 routerv1.post("/auth/register", AuthController.Register);
 routerv1.patch("/auth/resetpassword", AuthController.ResetPassword);
 routerv1.delete("/auth/delete", authenticate, AuthController.RemoveAccount);
@@ -50,7 +51,9 @@ routerv1.post(
   upload.single("photoProduct"),
   ProductController.Create
 );
-routerv1.get("/product", authenticate, ProductController.FindMany);
+routerv1.get("/product", ProductController.FindMany);
+routerv1.get("/product/:id", ProductController.findProduct);
+routerv1.get("/my-product", authenticate, ProductController.findMyProducts);
 routerv1.delete("/product/:id", authenticate, ProductController.Remove);
 routerv1.delete("/product", ProductController.RemoveAll);
 routerv1.patch(

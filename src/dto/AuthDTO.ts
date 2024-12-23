@@ -16,6 +16,7 @@ export type UserProfileDto = {
   bio?: string;
   photoProfile?: string;
   coverImage?: string;
+  isLogin?: boolean;
 };
 
 export type ResetDTO = {

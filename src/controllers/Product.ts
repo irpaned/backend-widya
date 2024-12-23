@@ -14,6 +14,8 @@ async function Create(req: Request, res: Response) {
     const body = {
       ...req.body,
       price: Number(req.body.price),
+      discount: Number(req.body.discount),
+      stock: Number(req.body.stock),
       photoProduct: req.file?.path,
     };
     const createProduct = await ProductService.create(body, user.id);
@@ -40,15 +42,26 @@ async function Update(req: Request, res: Response) {
     const files = req.files as {
       [fieldname: string]: Express.Multer.File[];
     };
+
     const body = {
       ...req.body,
       photoProduct: files?.["photoProduct"]?.[0]?.path,
       price: Number(req.body.price),
+      discount: Number(req.body.discount),
+      stock: Number(req.body.stock),
     };
 
     const data = await ProductService.edit(Number(id), body, user.id);
+
     res.status(200).json(data);
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error updating product:", error);
+
+    res.status(500).json({
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    });
+  }
 }
 
 async function RemoveAll(req: Request, res: Response) {
@@ -62,10 +75,32 @@ async function RemoveAll(req: Request, res: Response) {
   }
 }
 
+async function findProduct(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const data = await ProductService.findProduct(Number(id));
+    res.status(200).json(data);
+  } catch (error) {
+    throw new String(error);
+  }
+}
+async function findMyProducts(req: Request, res: Response) {
+  try {
+    const { id } = res.locals.user;
+    console.log("id", id);
+    const data = await ProductService.findMyProducts(Number(id));
+    res.status(200).json(data);
+  } catch (error) {
+    throw new String(error);
+  }
+}
+
 export default {
   FindMany,
   Create,
   Remove,
   Update,
   RemoveAll,
+  findProduct,
+  findMyProducts,
 };

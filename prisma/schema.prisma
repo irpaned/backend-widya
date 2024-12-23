@@ -22,6 +22,7 @@ model User {
   photoProfile String?
   coverImage   String?
   bio          String?
+  isLogin      Boolean @default(false)
 
   product ProductPackage[]
 
@@ -33,12 +34,16 @@ model User {
 }
 
 model ProductPackage {
-  id           Int      @id @default(autoincrement())
-  photoProduct String
-  productName  String
-  price        Int?     @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  id                 Int      @id @default(autoincrement())
+  photoProduct       String
+  productName        String
+  stock              Int
+  description        String
+  discount           Int?     @default(0)
+  priceAfterDiscount Int?     @default(0)
+  price              Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?

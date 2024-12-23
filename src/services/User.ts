@@ -93,7 +93,7 @@ async function UpdateProfile(userId: number, dto: UserProfileDto) {
 
     return await prisma.user.update({
       where: { id: userId },
-      data: { ...dto },
+      data: { isLogin: true, ...dto },
     });
   } catch (error) {
     throw new String(error);

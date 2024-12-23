@@ -9,6 +9,14 @@ async function findMany() {
   return await prisma.productPackage.findMany();
 }
 
+async function findMyProducts(id: number) {
+  return await prisma.productPackage.findMany({
+    where: {
+      userId: Number(id),
+    },
+  });
+}
+
 async function create(dto: ProductDTO, userId: number) {
   try {
     const photoProductData = productSchema.validate(dto);
@@ -19,6 +27,21 @@ async function create(dto: ProductDTO, userId: number) {
       dto.photoProduct = upload.secure_url;
     }
 
+    if (dto.discount > 0) {
+      const result = dto.price * (dto.discount / 100);
+      dto.priceAfterDiscount = dto.price - result;
+    }
+
+    console.log(
+      "discount",
+      dto.priceAfterDiscount,
+      "price",
+      dto.price,
+      "discount",
+
+      dto.discount
+    );
+
     return await prisma.productPackage.create({
       data: {
         ...dto,
@@ -26,10 +49,7 @@ async function create(dto: ProductDTO, userId: number) {
       },
     });
   } catch (error) {
-    throw new Error(
-      "Failed to create product: " +
-        (error instanceof Error ? error.message : "Unknown error")
-    );
+    console.log(error);
   }
 }
 
@@ -61,12 +81,20 @@ async function edit(id: number, dto: ProductDTO, userId: number) {
       },
     });
 
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
     const user = await prisma.user.findFirst({
       where: { id: Number(userId) },
     });
 
+    if (!user) {
+      throw new Error("User not found");
+    }
+
     if (dto.photoProduct) {
-      if (product?.photoProduct) {
+      if (product.photoProduct) {
         await cloudinaryDelete(product.photoProduct);
       }
       const photoProduct = await cloudinaryUpload(dto.photoProduct);
@@ -74,25 +102,32 @@ async function edit(id: number, dto: ProductDTO, userId: number) {
     }
 
     if (dto.price) {
-      product!.price = dto.price;
+      product.price = dto.price;
     }
 
     if (dto.productName) {
-      product!.productName = dto.productName;
+      product.productName = dto.productName;
     }
 
-    if (product?.userId === user?.id) {
-      return await prisma.productPackage.update({
-        where: {
-          id: Number(id),
-        },
-        data: { ...dto },
-      });
-    } else {
-      throw new Error("You can't edit product other people");
+    if (dto.discount !== undefined) {
+      if (dto.discount < 0 || dto.discount > 100) {
+        throw new Error("Discount must be between 0 and 100");
+      }
+      const discountValue = product.price * (dto.discount / 100);
+      dto.priceAfterDiscount = product.price - discountValue;
     }
+
+    return await prisma.productPackage.update({
+      where: {
+        id: Number(id),
+      },
+      data: { ...dto },
+    });
   } catch (error) {
-    throw new String(error);
+    throw new Error(
+      "Failed to edit product: " +
+        (error instanceof Error ? error.message : "Unknown error")
+    );
   }
 }
 
@@ -104,4 +139,22 @@ async function RemoveAll() {
   }
 }
 
-export default { findMany, create, remove, edit, RemoveAll };
+async function findProduct(id: number) {
+  try {
+    return await prisma.productPackage.findFirst({
+      where: { id: Number(id) },
+    });
+  } catch (error) {
+    throw new String(error);
+  }
+}
+
+export default {
+  findMany,
+  create,
+  remove,
+  edit,
+  RemoveAll,
+  findProduct,
+  findMyProducts,
+};
