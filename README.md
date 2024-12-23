@@ -1,4 +1,4 @@
-# Node.js + Express + PostgreSQL (Backend)
+# Node.js + Express + PostgreSQL 
 
 ### **Setup Backend:**
 
