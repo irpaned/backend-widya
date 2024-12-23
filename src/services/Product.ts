@@ -32,16 +32,6 @@ async function create(dto: ProductDTO, userId: number) {
       dto.priceAfterDiscount = dto.price - result;
     }
 
-    console.log(
-      "discount",
-      dto.priceAfterDiscount,
-      "price",
-      dto.price,
-      "discount",
-
-      dto.discount
-    );
-
     return await prisma.productPackage.create({
       data: {
         ...dto,
@@ -49,7 +39,7 @@ async function create(dto: ProductDTO, userId: number) {
       },
     });
   } catch (error) {
-    console.log(error);
+    throw new String(error);
   }
 }
 

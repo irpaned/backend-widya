@@ -87,7 +87,6 @@ async function findProduct(req: Request, res: Response) {
 async function findMyProducts(req: Request, res: Response) {
   try {
     const { id } = res.locals.user;
-    console.log("id", id);
     const data = await ProductService.findMyProducts(Number(id));
     res.status(200).json(data);
   } catch (error) {

@@ -57,7 +57,6 @@ async function ResetPassword(req: Request, res: Response) {
 async function RemoveAccount(req: Request, res: Response) {
   try {
     const { email } = res.locals.user;
-    console.log("email remove", email);
     const remove = await AuthService.RemoveService(email);
 
     res.status(200).json(remove);
