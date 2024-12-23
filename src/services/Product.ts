@@ -107,12 +107,16 @@ async function edit(id: number, dto: ProductDTO, userId: number) {
       dto.priceAfterDiscount = product.price - discountValue;
     }
 
-    return await prisma.productPackage.update({
-      where: {
-        id: Number(id),
-      },
-      data: { ...dto },
-    });
+    if (user.id == product.userId) {
+      return await prisma.productPackage.update({
+        where: {
+          id: Number(id),
+        },
+        data: { ...dto },
+      });
+    } else {
+      throw new Error("You can't edit this product");
+    }
   } catch (error) {
     throw new Error(
       "Failed to edit product: " +
